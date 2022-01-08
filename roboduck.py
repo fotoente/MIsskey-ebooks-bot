@@ -72,7 +72,7 @@ def read_posts():
 
         
         try: 
-            req = requests.post("https://ente.fun/api/users/notes", json = {
+            req = requests.post("https://"+config.get("misskey","instance_read")+"/api/users/notes", json = {
                                                                             "userId": userid,
                                                                             "includeReplies" : includeReplies,
                                                                             "limit" : 100,
