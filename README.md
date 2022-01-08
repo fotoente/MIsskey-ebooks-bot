@@ -52,5 +52,6 @@ Just to test it you can use `nohup python3.9 rdbot.py &` in the directory the bo
 ### Known Quirks
 - The startup needs quite some time. On my system about 10 seconds. You knwo that everything runs well when the first Note is posted.
 - When the bot is started, it could happen that he runs in a timeout in the first 60 seconds. To prevent that, just mention the bot and he will stay in a loop
+- When a DM is sent to the bot he exits completly. There is a missing subroutine, who will be fixed in a later version of the framework
 
 ## Works on my machine!
