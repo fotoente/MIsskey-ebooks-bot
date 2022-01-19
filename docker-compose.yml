@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  misskey-ebooks-bot:
+    build:
+      context: ./
+    container_name: misskey-ebooks-bot
+    restart: always
+    volumes:
+      - ./bot.cfg:/usr/src/app/bot.cfg
+      - ./roboduck.db:/usr/src/app/roboduck.db
+      - ./markov.json:/usr/src/app/markov.json

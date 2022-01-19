@@ -1,0 +1,9 @@
+.git*
+__pycache__
+bot.cfg
+README.md
+LICENSE
+markov.json
+roboduck.db
+docker-compose.yml
+Dockerfile
