@@ -97,7 +97,7 @@ def read_posts():
     
     for item in textList:
         content = str(item["text"])+"\n" #Gets the text item of every JSON element
-        content = re.sub(r"@([a-zA-Z0-9-]*(\.)?)*[a-zA-Z0-9-]*\.[a-zA-z]*", '', content) #Remove instance name with regular expression
+        content = re.sub(r"@([a-zA-Z0-9-]*(\.))*[a-zA-Z0-9-]*\.[a-zA-z]*", '', content) #Remove instance name with regular expression
         content = content.replace("::",": :") #Break long emoji chains
         text += content.replace("@", "@"+chr(8203))
     
