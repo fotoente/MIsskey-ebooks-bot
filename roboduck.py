@@ -91,7 +91,7 @@ def read_posts():
             textList.append(textDict)   
         
         
-        
+        print (i)
         oldnote = noteid
 
     
