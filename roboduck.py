@@ -50,12 +50,7 @@ def get_notes(**kwargs):
     #print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
     
     url="https://"+config.get("misskey","instance_read")+"/api/users/show"
-    
-    if (config.get("misskey","instance_read") == config.get("misskey","instance_write")):
-        host=None
-    else:
-        host=config.get("misskey","instance_read")
-    
+    host=config.get("misskey","instance_read")
     try:
         req = requests.post(url, json={"username" : config.get("misskey","user_read"), "host" : host})
         req.raise_for_status()
