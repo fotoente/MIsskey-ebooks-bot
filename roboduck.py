@@ -89,15 +89,11 @@ def read_posts():
 
 
     for item in textList:
-        if item["text"] is None: # skip if text is empty for some reason
+        if item["text"] is None: #Skips empty notes (I don't know how there could be empty notes)
             continue
 
         content = str(item["text"])+"\n" #Gets the text item of every JSON element
-
-        if content is None: #Skips empty notes (I don't know how there could be empty notes)
-            continue
-
-        content = re.sub(r"@([a-zA-Z0-9-]*(\.))*[a-zA-Z0-9-]*\.[a-zA-z]*", '', content) #Remove instance name with regular expression
+        content = re.sub(r"@[\w\-]+(?:@[\w\-\.]+)?", '', content) #Remove instance name with regular expression
         content = content.replace("::",": :") #Break long emoji chains
         text += content.replace("@", "@"+chr(8203))
 
