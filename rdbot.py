@@ -70,5 +70,5 @@ class MyBot(commands.Bot):
 
 if __name__ == "__main__":
     bot = MyBot()
-    asyncio.run(bot.start(uri, token))
+    asyncio.run(bot.start(uri, token, timeout=600))
    

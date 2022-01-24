@@ -22,7 +22,7 @@ def read_posts():
     #Load configuration
     config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
+    #print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
     
     url="https://"+config.get("misskey","instance_read")+"/api/users/show"
     
@@ -90,13 +90,15 @@ def read_posts():
             textDict = jsonObj
             textList.append(textDict)   
         
-        
-        print (i)
         oldnote = noteid
 
-    
+   
     for item in textList:
         content = str(item["text"])+"\n" #Gets the text item of every JSON element
+        
+        if content is None: #Skips empty notes (I don't know how there could be empty notes)
+            continue
+        
         content = re.sub(r"@([a-zA-Z0-9-]*(\.))*[a-zA-Z0-9-]*\.[a-zA-z]*", '', content) #Remove instance name with regular expression
         content = content.replace("::",": :") #Break long emoji chains
         text += content.replace("@", "@"+chr(8203))
@@ -107,10 +109,12 @@ def read_posts():
     
 
 def create_post(text_model):
+    note=""
+
     #Reading config file bot.cfg with config parser
     config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
+    #print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
     
     #Read & Sanitize Inputs
     try:
@@ -152,7 +156,7 @@ def create_post(text_model):
         
         if (max_words is not None and min_words is not None):
             if (min_words >= max_words):
-                print("min_words ("+str(min_words)+") bigger than max_words ("+str(max_words)+")! Swapping values!")
+                #print("min_words ("+str(min_words)+") bigger than max_words ("+str(max_words)+")! Swapping values!")
                 swap = min_words
                 min_words = max_words
                 max_words = swap
@@ -175,7 +179,6 @@ def create_post(text_model):
     print("min_words: " + str(min_words))
     """
     
-    
     #Applying Inputs
     note = text_model.make_sentence(
                                     test_output = test_output,
@@ -185,4 +188,5 @@ def create_post(text_model):
                                     max_words = max_words,
                                     min_words = min_words
                                     )
+                                   
     return note

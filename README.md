@@ -1,5 +1,6 @@
 # MIsskey-ebooks-bot
 Misskey eBooks Bot with Markov Chain
+
 [Example @roboduck@ente.fun](https://ente.fun/@roboduck)
 
 ### Introduction
@@ -9,7 +10,7 @@ It can only read and write from and to Misskey. Reading from Mastodon or Pleroma
 It posts every hour on his own and reacts to mentions. Every 12 hours the bot reloads the notes and recalculates the Markov Chain.
 
 ### Installation
-To run `mi.py` you must isntall `python3.9` and `python3.9-dev` onto your system.
+To run `mi.py` you must isntall `python3.9` and `python3.9-dev` onto your system. (Please be aware of the requirements for mi.py!)
 `mi.py` is still under development and a lot of things change there quickly so please be aware that there could be chances that something changed, that I haven't implemented in the bot at the moment.
 to install `mi.py`please use the following command.
 `pip install git+https://github.com/yupix/Mi.py.git`
@@ -51,7 +52,7 @@ Just to test it you can use `nohup python3.9 rdbot.py &` in the directory the bo
 
 ### Known Quirks
 - The startup needs quite some time. On my system about 10 seconds. You knwo that everything runs well when the first Note is posted.
-- When the bot is started, it could happen that he runs in a timeout in the first 60 seconds. To prevent that, just mention the bot and he will stay in a loop
-- When a DM is sent to the bot he exits completly. There is a missing subroutine, who will be fixed in a later version of the framework
+- When the bot is started, it could happen that he runs in a timeout in the first 60 seconds. To prevent that, just mention the bot and he will stay in a loop.
+- If a lot of notes are loaded, the bot sometimes get stuck. To work around this don't use more than 5.000 notes to load.
 
 ## Works on my machine!
