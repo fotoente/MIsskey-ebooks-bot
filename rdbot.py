@@ -5,6 +5,7 @@ from random import *
 import mi
 import sys
 import configparser
+import threading
 from mi import Note
 from mi.ext import commands, tasks
 from mi.note import Note
@@ -30,13 +31,12 @@ class MyBot(commands.Bot):
         
     @tasks.loop(3600)
     async def loop_1h(self):
-        if (bot.text_model is not None): #Just a check to see that there is a object stored
-            await bot.client.note.send(content=create_post(bot.text_model))
+        text = create_sentence()
+        await bot.client.note.send(content=text)
     
     @tasks.loop(43200)
     async def loop_12h(self):
-        bot.text_model = read_posts()
-        print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')+" Posts loaded!")
+            update.start()
 
     async def on_ready(self, ws):
         await Router(ws).connect_channel(["global", "main"])  #Connect to global and main channels
@@ -55,20 +55,16 @@ class MyBot(commands.Bot):
             else:
                 text = "@" + note.author.name + "@" + note.author.host + " " #Building the reply on foreign instance
             
-            if (bot.text_model is not None):
-                markov = create_post(bot.text_model)
-            else:
-                markov = "Error loading markov chain object!" 
-            
-            if markov is not None: # better: if item is not None
-                text+=markov
-            else:        
-                text+="Error in markov chain sentence creation: Couldn't calculate sentence!\n\n☹ Please try again! " 
+            text += create_sentence()
             
             await note.reply(content=text) #Reply to a note
 
 
 if __name__ == "__main__":
+    if (not os.path.exists(os.path.join(os.path.dirname(__file__), 'roboduck.db'))):
+        init_bot()
+    
+    update = threading.Thread(target=update)
     bot = MyBot()
     asyncio.run(bot.start(uri, token, timeout=600))
    

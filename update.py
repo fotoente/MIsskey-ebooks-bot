@@ -1,0 +1,3 @@
+from roboduck import *
+
+update()

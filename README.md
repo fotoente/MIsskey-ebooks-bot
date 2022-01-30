@@ -5,9 +5,14 @@ Misskey eBooks Bot with Markov Chain
 
 ### Introduction
 This small python script is a Markov Chain eBooks bot based on the framework of [mi.py](https://github.com/yupix/Mi.py.git)
+
 It can only read and write from and to Misskey. Reading from Mastodon or Pleroma is not (yet) implemented.
 
 It posts every hour on his own and reacts to mentions. Every 12 hours the bot reloads the notes and recalculates the Markov Chain.
+
+### Operating mode
+On the first start up the bot loads a given number of posts into his database and calculates the Markov Chain out of it.
+After this he only updates the database with new posts. The upgrading is threaded so the bot itself isn't interrupted while the new markov chain is calulated.
 
 ### Installation
 To run `mi.py` you must isntall `python3.9` and `python3.9-dev` onto your system. (Please be aware of the requirements for mi.py!)
@@ -33,13 +38,14 @@ Following things can be edited:
 |user_read|`username`|The user you want to read the notes from|
 |instance_write|domain.tld|Put here the domain of the Misskey instance your bot is running. Only domain name and TLD, no `/`,`:` or `https`
 |token|`String`|The token from your bot. Needs right to write notes and read notification|
-|notes_count|`interger`|How many posts should be read. Please state a number in 100 increments. Higher number means more variety but also more load when loading those and a bigger RAM consumption. 5000 notes resulted in ~70 MB of RAM used. Default `5000`|
+|min_notes|`interger`|How many posts should be read at the initial start. Please state a number in 100 increments. Higher number means more variety but also more load when loading those and a bigger database and json file. 5000 notes resulted in ~3 MB disk space used. Default `5000`|
+|max_notes|`interger`|How many posts should be stored in the database. Everything over this number will be deleted during an update cycle Default `5000`|
 |includeReplies|`boolean`|Should replies included into the markov chain? Default `True`|
 |includeMyRenotes|`boolean`|Should the notes you renoted be included? So your bot will make sentences you didn't wrote. Default `false`|
 |excludeNsfw|`boolean`|Should be Notes included that are behind a CW Tag? Default `False` (Use with caution! The bot not CW any post he makes!)|
 |test_output|`boolean`|Should be the created sentence be tested against the following statements? Default `true` (Highly recomended, otherwise sentences could repeat itself, could be very short or very long.)|
 |tries|`integer`|How many times the bot tries to make a sentence that meets the given criteria|
-|max_overlap_ratio|`float`|How many pervent of the created sentence is allowed to be the same as the source text. Lower value means more gibberish, higher value to more exact copies of source material. Can be between `0`and `1`. Default `0.6`|
+|max_overlap_ratio|`float`|How many percent of the created sentence is allowed to be the same as the source text. Lower value means more gibberish, higher value to more exact copies of source material. Can be between `0`and `1`. Default `0.6`|
 |max_overlap_total|`integer`|How many words are allowed to be the same? Default `15`|
 |min_words|`integer`|How many words the sentence must have at least. Default `None`|
 |max_words|`integer`|How many words the sentence must have at maximum. Default `None`|
@@ -52,7 +58,6 @@ Just to test it you can use `nohup python3.9 rdbot.py &` in the directory the bo
 
 ### Known Quirks
 - The startup needs quite some time. On my system about 10 seconds. You knwo that everything runs well when the first Note is posted.
-- When the bot is started, it could happen that he runs in a timeout in the first 60 seconds. To prevent that, just mention the bot and he will stay in a loop.
-- If a lot of notes are loaded, the bot sometimes get stuck. To work around this don't use more than 5.000 notes to load.
+- When the bot is started, it could happen that he runs in a timeout in the first 600 seconds. To prevent that, just mention the bot and he will stay in a loop.
 
 ## Works on my machine!
