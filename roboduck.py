@@ -145,8 +145,8 @@ def calculate_markov_chain():
 
     databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
     
-    if (not os.path.exists(databasepath)):
-        print("Roboduck database already created!")
+    if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
+        print("Roboduck database not already created!")
         print("Exit initialization!")
         sys.exit(0)
     
@@ -172,7 +172,7 @@ def calculate_markov_chain():
 def clean_database():
     databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
     
-    if (not os.path.exists(databasepath)):
+    if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
         print("No database found!")
         print("Please run Bot first!")
         sys.exit(0)
@@ -290,7 +290,7 @@ def update():
     notesList = []
     databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
     
-    if (not os.path.exists(databasepath)):
+    if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
         print("No database found!")
         print("Please run Bot first!")
         sys.exit(0)
@@ -335,7 +335,7 @@ def init_bot():
     notesList = []
     databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
     
-    if (os.path.exists(databasepath)):
+    if (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0):
         print("Roboduck database already created!")
         print("Exit initialization!")
         sys.exit(0)

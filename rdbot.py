@@ -61,7 +61,9 @@ class MyBot(commands.Bot):
 
 
 if __name__ == "__main__":
-    if (not os.path.exists(os.path.join(os.path.dirname(__file__), 'roboduck.db'))):
+    databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
+
+    if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
         init_bot()
     
     
