@@ -6,6 +6,7 @@ import re
 import configparser
 import markovify
 import sqlite3
+from pathlib import Path
 from datetime import *
 from time import sleep
 
@@ -136,15 +137,13 @@ def calculate_markov_chain():
     text = ""
     #Load configuration
     config = configparser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    
+    config.read((Path(__file__).parent).joinpath('bot.cfg'))
     try:
         max_notes = config.get("markov","max_notes")
     except (TypeError, ValueError) as err:
         max_notes = "10000"
 
-    databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
-    
+    databasepath = (Path(__file__).parent).joinpath('roboduck.db')
     if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
         print("Roboduck database not already created!")
         print("Exit initialization!")
@@ -166,12 +165,11 @@ def calculate_markov_chain():
     
     markov_json = markovchain.to_json()
         
-    with open((os.path.join(os.path.dirname(__file__), 'markov.json')), "w", encoding="utf-8") as markov:
+    with open((Path(__file__).parent).joinpath('markov.json'), "w", encoding="utf-8") as markov:
         json.dump(markov_json, markov)
 
 def clean_database():
-    databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
-    
+    databasepath = (Path(__file__).parent).joinpath('roboduck.db')
     if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
         print("No database found!")
         print("Please run Bot first!")
@@ -182,9 +180,8 @@ def clean_database():
         
     #Reading config file bot.cfg with config parser
     config = configparser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    #print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    
+    config.read((Path(__file__).parent).joinpath('bot.cfg'))
+    #print((Path(__file__).parent).joinpath('bot.cfg'))
     try:
         max_notes = config.get("markov","max_notes")
     except (TypeError, ValueError) as err:
@@ -197,7 +194,7 @@ def clean_database():
     database.close()
 
 def create_sentence():
-    with open((os.path.join(os.path.dirname(__file__), 'markov.json')), "r", encoding="utf-8") as markov:
+    with open((os.path.join((Path(__file__).parent), 'markov.json')), "r", encoding="utf-8") as markov:
         markov_json = json.load(markov)
         
     text_model = markovify.Text.from_json(markov_json)
@@ -206,9 +203,8 @@ def create_sentence():
 
     #Reading config file bot.cfg with config parser
     config = configparser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    #print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    
+    config.read((Path(__file__).parent).joinpath('bot.cfg'))
+    #print((Path(__file__).parent).joinpath('bot.cfg'))
     #Read & Sanitize Inputs
     try:
         test_output = check_str_to_bool(config.get("markov","test_output"))
@@ -288,8 +284,7 @@ def create_sentence():
     
 def update():
     notesList = []
-    databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
-    
+    databasepath = (Path(__file__).parent).joinpath('roboduck.db')
     if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
         print("No database found!")
         print("Please run Bot first!")
@@ -333,8 +328,7 @@ def update():
 
 def init_bot():
     notesList = []
-    databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
-    
+    databasepath = (Path(__file__).parent).joinpath('roboduck.db')
     if (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0):
         print("Roboduck database already created!")
         print("Exit initialization!")
@@ -353,8 +347,7 @@ def init_bot():
     
     #Load configuration
     config = configparser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    
+    config.read((Path(__file__).parent).joinpath('bot.cfg'))
     try:
         initnotes = int(config.get("markov","min_notes"))
     except (TypeError, ValueError) as err:

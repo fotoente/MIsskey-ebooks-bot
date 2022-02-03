@@ -6,6 +6,7 @@ import mi
 import sys
 import configparser
 import threading
+from pathlib import Path
 from mi import Note
 from mi.ext import commands, tasks
 from mi.note import Note
@@ -16,7 +17,7 @@ from roboduck import *
 
 #Load Misskey configuration
 config = configparser.ConfigParser()
-config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
+config.read((Path(__file__).parent).joinpath('bot.cfg'))
 uri="wss://"+config.get("misskey","instance_write")+"/streaming"
 token=config.get("misskey","token")
 
@@ -61,7 +62,7 @@ class MyBot(commands.Bot):
 
 
 if __name__ == "__main__":
-    databasepath = os.path.join(os.path.dirname(__file__), 'roboduck.db')
+    databasepath = (Path(__file__).parent).joinpath('roboduck.db')
 
     if (not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0)):
         init_bot()
