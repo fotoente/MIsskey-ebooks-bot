@@ -56,6 +56,13 @@ You can change the configuration while the bot is running. No restart necessary,
 The best way to run it would be a `systemd` unit file and run it as a deamon.
 Just to test it you can use `nohup python3.9 rdbot.py &` in the directory the bot is located in.
 
+If using docker, first run `touch markov.json roboduck.db` in order to create
+the files before starting the docker container. If these files don't exist,
+Docker will automatically try to create directories instead.
+
+Then, simply run `docker-compose up --build` to start the app, or
+`docker-compose up --build -d` to start the bot in detached mode!
+
 ### Known Quirks
 - The startup needs quite some time. On my system about 10 seconds. You knwo that everything runs well when the first Note is posted.
 - When the bot is started, it could happen that he runs in a timeout in the first 600 seconds. To prevent that, just mention the bot and he will stay in a loop.
