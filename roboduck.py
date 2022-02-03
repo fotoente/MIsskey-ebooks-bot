@@ -123,7 +123,7 @@ def get_notes(**kwargs):
         if content is None: #Skips empty notes (I don't know how there could be empty notes)
             continue
         
-        content = re.sub(r"@([a-zA-Z0-9-]*(\.))*[a-zA-Z0-9-]*\.[a-zA-z]*", '', content) #Remove instance name with regular expression
+        content = re.sub(r"(?:@[\w\-]+)(?:@[\w\-\.]+)?", '', content) #Remove instance name with regular expression
         content = content.replace("::",": :") #Break long emoji chains
         content = content.replace("@", "@"+chr(8203))
         
