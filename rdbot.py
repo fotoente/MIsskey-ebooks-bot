@@ -25,9 +25,7 @@ class MyBot(commands.Bot):
     text_model = None #Holds the markov object, so it won't be recreated everytime
     
     def __init__(self):
-        super().__init__()
-        #self.text_model = read_posts()
-        #print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')+" Posts initialized!")            
+        super().__init__()            
         
     @tasks.loop(3600)
     async def loop_1h(self):
@@ -36,11 +34,13 @@ class MyBot(commands.Bot):
     
     @tasks.loop(43200)
     async def loop_12h(self):
-            update.start()
+            thread_update = threading.Thread(target=update)
+            thread_update.setDaemon(True)
+            thread_update.start()
 
     async def on_ready(self, ws):
         await Router(ws).connect_channel(["global", "main"])  #Connect to global and main channels
-        await bot.client.note.send(content=datetime.now().strftime('%Y-%m-%d %H:%M:%S')+" :roboduck: Bot started!", visibility="specified")
+        await bot.client.note.send(content=datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " :roboduck: Bot started!", visibility="specified")
         self.loop_12h.start()  #Launching renew posts every 12 hours
         self.loop_1h.start() #
         print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')+" Roboduck Bot started!")
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     if (not os.path.exists(os.path.join(os.path.dirname(__file__), 'roboduck.db'))):
         init_bot()
     
-    update = threading.Thread(target=update)
+    
     bot = MyBot()
     asyncio.run(bot.start(uri, token, timeout=600))
    

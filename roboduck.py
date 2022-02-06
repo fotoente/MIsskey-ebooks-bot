@@ -57,10 +57,10 @@ def get_notes(**kwargs):
         host=config.get("misskey","instance_read")
     
     try:
-        req = requests.post(url, json={"username": config.get("misskey","user_read"), "host":host})
+        req = requests.post(url, json={"username" : config.get("misskey","user_read"), "host" : host})
         req.raise_for_status()
     except requests.exceptions.HTTPError as err:
-        print("Couldn't get Username! "+str(err))
+        print("Couldn't get Username! " + str(err))
         sys.exit(1)
         
     
@@ -159,7 +159,7 @@ def calculate_markov_chain():
         database = sqlite3.connect(databasepath)
     
     data = database.cursor()
-    data.execute("SELECT text FROM notes LIMIT " + max_notes + ";")
+    data.execute("SELECT text FROM notes ORDER BY timestamp DESC LIMIT " + max_notes + ";")
     
     rows = data.fetchall()
     
@@ -179,12 +179,11 @@ def clean_database():
     
     if (not os.path.exists(databasepath)):
         print("No database found!")
-        print("Please run init_rd.py first!")
+        print("Please run Bot first!")
         sys.exit(0)
     
     with open(databasepath, "a", encoding="utf-8") as f:
         database = sqlite3.connect(databasepath)
-        print("Connected to roboduck.db succesfull...")
         
     #Reading config file bot.cfg with config parser
     config = configparser.ConfigParser()
@@ -197,7 +196,7 @@ def clean_database():
         max_notes = "10000"
     
     data = database.cursor()
-    data.execute("DELETE FROM notes WHERE id NOT IN (SELECT id FROM notes  ORDER BY timestamp DESC LIMIT " + max_notes + ");")
+    data.execute("DELETE FROM notes WHERE id NOT IN (SELECT id FROM notes ORDER BY timestamp DESC LIMIT " + max_notes + ");")
     
     database.commit()
     database.close()
@@ -298,7 +297,7 @@ def update():
     
     if (not os.path.exists(databasepath)):
         print("No database found!")
-        print("Please run init_rd.py first!")
+        print("Please run Bot first!")
         sys.exit(0)
     
     with open(databasepath, "a", encoding="utf-8") as f:
@@ -318,7 +317,7 @@ def update():
     
     print("Insert new notes to database...")
     for note in notesList:
-        database.execute("INSERT INTO notes (id, text, timestamp) VALUES(?, ?, ?)", [note["id"], note["text"], note["timestamp"]])
+        database.execute("INSERT OR IGNORE INTO notes (id, text, timestamp) VALUES(?, ?, ?)", [note["id"], note["text"], note["timestamp"]])
     
     database.commit() 
     print("Notes updated!")
@@ -335,7 +334,7 @@ def update():
     calculate_markov_chain()
     print("Markov Chain saved!")
     
-    print("\n Update done!")
+    print("\nUpdate done!")
 
 def init_bot():
     notesList = []
@@ -365,7 +364,7 @@ def init_bot():
         initnotes = int(config.get("markov","min_notes"))
     except (TypeError, ValueError) as err:
         #print(err)
-        initnotes=10
+        initnotes=1000
 
     print("Try reading first " + str(initnotes) + " notes.")
     
