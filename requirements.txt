@@ -3,3 +3,4 @@ configparser
 ujson
 requests
 msgpack
+regex
