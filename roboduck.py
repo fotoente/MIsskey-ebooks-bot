@@ -2,7 +2,7 @@ import requests
 import json
 import os
 import sys
-import re
+import regex
 import configparser
 import markovify
 import sqlite3
@@ -124,7 +124,7 @@ def get_notes(**kwargs):
         if content is None: #Skips empty notes (I don't know how there could be empty notes)
             continue
 
-        content = re.sub(r"(?:@[\w\-]+)(?:@[\w\-\.]+)?", '', content) #Remove instance name with regular expression
+        content = regex.sub(r"(?>@(?>[\w\-])+)(?>@(?>[\w\-\.])+)?", '', content) #Remove instance name with regular expression
         content = content.replace("::",": :") #Break long emoji chains
         content = content.replace("@", "@"+chr(8203))
 
