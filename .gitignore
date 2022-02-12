@@ -3,3 +3,4 @@ markov.json
 test-rd.py
 bot.cfg
 __pycache__
+/mia-markov-chain
