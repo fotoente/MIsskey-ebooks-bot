@@ -1,6 +1,6 @@
 FROM python:3-alpine
 
-RUN apk add --no-cache py3-pip py3-setuptools
+RUN apk add --no-cache py3-pip py3-setuptools py3-distutils-extra
 
 WORKDIR /usr/src/app
 
