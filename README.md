@@ -26,6 +26,7 @@ For the bot to run you also need two additional packages
 ```
 markovify
 configparser
+regex
 ```
 
 or just use the command `pip install -r requirements.txt` in the local folder where you cloned the repo.
