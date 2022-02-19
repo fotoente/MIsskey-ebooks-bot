@@ -1,2 +1,6 @@
 markovify
 configparser
+ujson
+requests
+msgpack
+regex
