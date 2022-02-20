@@ -1,12 +1,11 @@
 FROM python:3-alpine
 
 RUN apk add --no-cache \
-  py3-pip \
-  py3-setuptools \
-  py3-distutils-extra \
-  git \
-  gcc \
-  libc-dev
+	py3-pip \
+	py3-setuptools \
+	python3-dev \
+	git \
+	build-base
 
 WORKDIR /usr/src/app
 
