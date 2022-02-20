@@ -50,6 +50,8 @@ before starting the docker container.
 Then, simply run `docker-compose up` to start the app, or `docker-compose up -d`
 to start the bot in detached mode!
 
+You can find the bot on Dockerhub just use `docker pull fotoente/misskey-ebooks-bot:latest`
+
 ## Configuration
 Following things can be edited:
 |Name|Values|Explanation|
