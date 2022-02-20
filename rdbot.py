@@ -10,7 +10,7 @@ from roboduck import *
 # Load Misskey configuration
 config = configparser.ConfigParser()
 config.read(Path(__file__).parent.joinpath('bot.cfg'))
-uri = config.get("misskey", "instance_write")
+uri = "https://" + config.get("misskey", "instance_write")
 token = config.get("misskey", "token")
 
 
@@ -41,7 +41,7 @@ class MyBot(commands.Bot):
 
     async def on_mention(self, note: Note):
         if not note.author.is_bot:
-            text = note.author.action.get_mention()
+            text = note.author.action.get_mention() + " "
             text += create_sentence()
 
             await note.reply(content=text)  # Reply to a note
