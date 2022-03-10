@@ -23,7 +23,7 @@ class MyBot(commands.Bot):
     @tasks.loop(3600)
     async def loop_1h(self):
         text = create_sentence()
-        await bot.client.note.send(content=text)
+        await bot.client.note.send(content=text, visibility="home")
 
     @tasks.loop(43200)
     async def loop_12h(self):
