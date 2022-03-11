@@ -194,8 +194,12 @@ def clean_database():
     except (TypeError, ValueError) as err:
         max_notes = "10000"
 
-    data = database.cursor()
-    data.execute("DELETE FROM notes WHERE id NOT IN (SELECT id FROM notes ORDER BY timestamp DESC LIMIT " + max_notes + ");")
+    for user in config.get("misskey", "users").split(";"):
+        username = user.split("@")[1]
+        instance = user.split("@")[2]
+        userid = get_user_id(username, instance)
+        data = database.cursor()
+        data.execute("DELETE FROM notes WHERE user_id=:user_id AND id NOT IN (SELECT id FROM notes WHERE user_id=:user_id ORDER BY timestamp DESC LIMIT :max );", {"user_id": userid, "max": int(max_notes)})
 
     database.commit()
     database.close()
