@@ -28,7 +28,7 @@ class MyBot(commands.Bot):
     @tasks.loop(43200)
     async def loop_12h(self):
         thread_update = threading.Thread(target=update)
-        thread_update.setDaemon(True)
+        thread_update.daemon = True
         thread_update.start()
 
     async def on_ready(self, ws):
