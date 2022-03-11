@@ -325,9 +325,7 @@ def update():
         return
 
     print("Insert new notes to database...")
-    for note in notesList:
-        database.execute("INSERT OR IGNORE INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)",
-                         [note["id"], note["text"], note["timestamp"], note["user_id"]])
+    database.executemany("INSERT OR IGNORE INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)", [(note["id"],note["text"],note["timestamp"],note["user_id"]) for note in notesList])
 
     database.commit()
     print("Notes updated!")
@@ -383,9 +381,7 @@ def init_bot():
 
         print("Writing notes into database...")
 
-        for note in notesList:
-            database.execute("INSERT INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)",
-                            [note["id"], note["text"], note["timestamp"], note["user_id"]])
+        database.executemany("INSERT INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)", [(note["id"], note["text"], note["timestamp"], note["user_id"]) for note in notesList])
 
     database.commit()
     database.close()
