@@ -2,8 +2,7 @@ version: "3"
 
 services:
   misskey-ebooks-bot:
-    build:
-      context: ./
+    image: fotoente/misskey-ebooks-bot
     container_name: misskey-ebooks-bot
     restart: always
     volumes:
