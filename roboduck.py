@@ -19,6 +19,15 @@ def check_str_to_bool(text) -> bool:
     else:
         return True
 
+def get_user_id(username, instance):
+    url = "https://" + instance + "/api/users/show"
+    try:
+        req = requests.post(url, json={"username": username, "host": instance})
+        req.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print("Couldn't get Username! " + str(err))
+        sys.exit(1)
+    return req.json()["id"]
 
 def get_notes(**kwargs):
     noteid = "k"
@@ -26,7 +35,10 @@ def get_notes(**kwargs):
     min_notes = 0
     notesList = []
     returnList = []
+    username = kwargs["username"]
+    instance = kwargs["instance"]
 
+    print("Reading notes for @" + username + "@" + instance + ".")
     if (kwargs):
         if ("min_notes" in kwargs):
             # print("min_notes found!")
@@ -52,16 +64,7 @@ def get_notes(**kwargs):
     config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
     # print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
 
-    url = "https://" + config.get("misskey", "instance_read") + "/api/users/show"
-    host = config.get("misskey", "instance_read")
-    try:
-        req = requests.post(url, json={"username": config.get("misskey", "user_read"), "host": host})
-        req.raise_for_status()
-    except requests.exceptions.HTTPError as err:
-        print("Couldn't get Username! " + str(err))
-        sys.exit(1)
-
-    userid = req.json()["id"]
+    userid = get_user_id(username, instance)
 
     # Read & Sanitize Inputs from Config File
     try:
@@ -88,7 +91,7 @@ def get_notes(**kwargs):
             break
 
         try:
-            req = requests.post("https://" + config.get("misskey", "instance_read") + "/api/users/notes", json={
+            req = requests.post("https://" + instance + "/api/users/notes", json={
                 "userId": userid,
                 "includeReplies": includeReplies,
                 "limit": 100,
@@ -107,7 +110,7 @@ def get_notes(**kwargs):
             notesList.append(jsonObj)
         if (len(notesList) == 0):
             print("No new notes to load!")
-            return 0
+            return []
 
         oldnote = noteid
 
@@ -130,7 +133,7 @@ def get_notes(**kwargs):
         content = content.replace("::", ": :")  # Break long emoji chains
         content = content.replace("@", "@" + chr(8203))
 
-        dict = {"id": element["id"], "text": content, "timestamp": lastTimestamp}
+        dict = {"id": element["id"], "text": content, "timestamp": lastTimestamp, "user_id": userid }
         returnList.append(dict)
 
     return returnList
@@ -191,8 +194,12 @@ def clean_database():
     except (TypeError, ValueError) as err:
         max_notes = "10000"
 
-    data = database.cursor()
-    data.execute("DELETE FROM notes WHERE id NOT IN (SELECT id FROM notes ORDER BY timestamp DESC LIMIT " + max_notes + ");")
+    for user in config.get("misskey", "users").split(";"):
+        username = user.split("@")[1]
+        instance = user.split("@")[2]
+        userid = get_user_id(username, instance)
+        data = database.cursor()
+        data.execute("DELETE FROM notes WHERE user_id=:user_id AND id NOT IN (SELECT id FROM notes WHERE user_id=:user_id ORDER BY timestamp DESC LIMIT :max );", {"user_id": userid, "max": int(max_notes)})
 
     database.commit()
     database.close()
@@ -300,21 +307,25 @@ def update():
         database = sqlite3.connect(databasepath)
         print("Connected to roboduck.db succesfull...")
 
-    data = database.cursor()
-    data.execute("SELECT id FROM notes WHERE timestamp = (SELECT MAX(timestamp) FROM notes);")
+    config = configparser.ConfigParser()
+    config.read((Path(__file__).parent).joinpath('bot.cfg'))
+    for user in config.get("misskey","users").split(";"):
+        username = user.split("@")[1]
+        instance = user.split("@")[2]
+        userid = get_user_id(username, instance)
+        data = database.cursor()
+        data.execute("SELECT id FROM notes WHERE timestamp = (SELECT MAX(timestamp) FROM notes WHERE user_id=:user_id) AND user_id=:user_id;", {"user_id": userid})
 
-    sinceNote = data.fetchone()[0]
+        sinceNote = data.fetchone()[0]
 
-    notesList = get_notes(lastnote=sinceNote)
+        notesList.extend(get_notes(lastnote=sinceNote, username=username, instance=instance))
 
     if (notesList == 0):
         database.close()
         return
 
     print("Insert new notes to database...")
-    for note in notesList:
-        database.execute("INSERT OR IGNORE INTO notes (id, text, timestamp) VALUES(?, ?, ?)",
-                         [note["id"], note["text"], note["timestamp"]])
+    database.executemany("INSERT OR IGNORE INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)", [(note["id"],note["text"],note["timestamp"],note["user_id"]) for note in notesList])
 
     database.commit()
     print("Notes updated!")
@@ -349,7 +360,7 @@ def init_bot():
         print("Connected to roboduck.db succesfull...")
 
     print("Creating Table...")
-    database.execute("CREATE TABLE notes (id CHAR(10) PRIMARY KEY, text CHAR(5000), timestamp INT);")
+    database.execute("CREATE TABLE notes (id CHAR(10) PRIMARY KEY, text CHAR(5000), timestamp INT, user_id CHAR(10));")
 
     print("Table NOTES created...")
 
@@ -362,15 +373,15 @@ def init_bot():
         # print(err)
         initnotes = 1000
 
-    print("Try reading first " + str(initnotes) + " notes.")
+    for user in config.get("misskey","users").split(";"):
 
-    notesList = get_notes(min_notes=initnotes)
+        print("Try reading first " + str(initnotes) + " notes for " + user + ".")
 
-    print("Writing notes into database...")
+        notesList = get_notes(min_notes=initnotes, username=user.split("@")[1], instance=user.split("@")[2])
 
-    for note in notesList:
-        database.execute("INSERT INTO notes (id, text, timestamp) VALUES(?, ?, ?)",
-                         [note["id"], note["text"], note["timestamp"]])
+        print("Writing notes into database...")
+
+        database.executemany("INSERT INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)", [(note["id"], note["text"], note["timestamp"], note["user_id"]) for note in notesList])
 
     database.commit()
     database.close()
