@@ -56,8 +56,7 @@ You can find the bot on Dockerhub just use `docker pull fotoente/misskey-ebooks-
 Following things can be edited:
 |Name|Values|Explanation|
 |----|----|----|
-|instance_read|domain.tld|Put here the domain of the Misskey instance you want to read the notes from. Only domain name and TLD, no `/`,`:` or `https`
-|user_read|`username`|The user you want to read the notes from|
+|users|`@username1@domain1.tld;@username2@domain2.tld`|The users you want to read the notes from, separated by semicolon (`;`). For single user just provide one `username@domain.tld`|
 |instance_write|domain.tld|Put here the domain of the Misskey instance your bot is running. Only domain name and TLD, no `/`,`:` or `https`
 |token|`String`|The token from your bot. Needs right to write notes and read notification|
 |min_notes|`interger`|How many posts should be read at the initial start. Please state a number in 100 increments. Higher number means more variety but also more load when loading those and a bigger database and json file. 5000 notes resulted in ~3 MB disk space used. Default `5000`|
