@@ -76,3 +76,10 @@ You can change the configuration while the bot is running. No restart necessary,
 ## Known Quirks
 - The startup needs quite some time. On my system about 10 seconds. You knwo that everything runs well when the first Note is posted.
 - When the bot is started, it could happen that he runs in a timeout in the first 600 seconds. To prevent that, just mention the bot and he will stay in a loop.
+
+## Contributors
+[Shibao](https://github.com/shibaobun) - Docker support and bug hunting<br />
+[Yupix](https://github.com/yupix) - Mi.py framework and clean code<br />
+[Nullobsi](https://github.com/nullobsi) - Added multi user support
+
+Thank you very much! Without your this project wouldn't be on this level!
