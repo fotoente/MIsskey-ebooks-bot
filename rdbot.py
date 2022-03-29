@@ -46,6 +46,8 @@ class MyBot(commands.Bot):
 
             await note.reply(content=text)  # Reply to a note
 
+    async def on_reconnect(self, ws):
+        await Router(ws).connect_channel(["global", "main"])  # Connect to global and main channels
 
 if __name__ == "__main__":
     databasepath = Path(__file__).parent.joinpath('roboduck.db')
