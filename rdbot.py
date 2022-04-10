@@ -13,6 +13,12 @@ config.read(Path(__file__).parent.joinpath('bot.cfg'))
 uri = "https://" + config.get("misskey", "instance_write")
 token = config.get("misskey", "token")
 
+try:
+    contentwarning = config.get("misskey", "cw")
+    if contentwarning.lower() == "none":
+        contentwarning = None
+except (TypeError, ValueError):
+    contentwarning = None
 
 class MyBot(commands.Bot):
     text_model = None  # Holds the markov object, so it won't be recreated everytime
@@ -23,7 +29,7 @@ class MyBot(commands.Bot):
     @tasks.loop(3600)
     async def loop_1h(self):
         text = create_sentence()
-        await bot.client.note.send(content=text, visibility="home")
+        await bot.client.note.send(content=text, visibility="home", cw=contentwarning)
 
     @tasks.loop(43200)
     async def loop_12h(self):
@@ -44,7 +50,7 @@ class MyBot(commands.Bot):
             text = note.author.action.get_mention() + " "
             text += create_sentence()
 
-            await note.reply(content=text)  # Reply to a note
+            await note.reply(content=text, cw=contentwarning)  # Reply to a note
 
     async def on_reconnect(self, ws):
         await Router(ws).connect_channel(["global", "main"])  # Connect to global and main channels

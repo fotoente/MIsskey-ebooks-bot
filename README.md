@@ -1,4 +1,4 @@
-# MIsskey-ebooks-bot
+# Misskey-ebooks-bot
 Misskey eBooks Bot with Markov Chain
 
 [Example @roboduck@ente.fun](https://ente.fun/@roboduck)
@@ -8,11 +8,11 @@ This small python script is a Markov Chain eBooks bot based on the framework of 
 
 It can only read and write from and to Misskey. Reading from Mastodon or Pleroma is not (yet) implemented.
 
-It posts every hour on his own and reacts to mentions. Every 12 hours the bot reloads the notes and recalculates the Markov Chain.
+It posts every hour on his own and reacts to mention. Every 12 hours the bot reloads the notes and recalculates the Markov Chain.
 
 ## Operating mode
 On the first start up the bot loads a given number of posts into his database and calculates the Markov Chain out of it.
-After this he only updates the database with new posts. The upgrading is threaded so the bot itself isn't interrupted while the new markov chain is calulated.
+After this he only updates the database with new posts. The upgrading is threaded so the bot itself isn't interrupted while the new markov chain is calculated.
 
 ## Installation
 
@@ -34,7 +34,7 @@ or just use the command `pip install -r requirements.txt` in the local folder wh
 Before starting the bot, please copy `example-bot.cfg` to `bot.cfg` and
 configure it according to the configuration section below.
 
-The best way to run it would be a `systemd` unit file and run it as a deamon.
+The best way to run it would be a `systemd` unit file and run it as a daemon.
 Just to test it you can use `nohup python3.9 rdbot.py &` in the directory the bot is located in.
 
 ### Docker
@@ -59,27 +59,30 @@ Following things can be edited:
 |users|`@username1@domain1.tld;@username2@domain2.tld`|The users you want to read the notes from, separated by semicolon (`;`). For single user just provide one `username@domain.tld`|
 |instance_write|domain.tld|Put here the domain of the Misskey instance your bot is running. Only domain name and TLD, no `/`,`:` or `https`
 |token|`String`|The token from your bot. Needs right to write notes and read notification|
+|cw|`String` or `None`|If the markov bot post should be posted with a content warning. Any String given here will show up as CW text. "none" to deactivate.|
 |min_notes|`interger`|How many posts should be read at the initial start. Please state a number in 100 increments. Higher number means more variety but also more load when loading those and a bigger database and json file. 5000 notes resulted in ~3 MB disk space used. Default `5000`|
 |max_notes|`interger`|How many posts should be stored in the database. Everything over this number will be deleted during an update cycle Default `5000`|
-|includeReplies|`boolean`|Should replies included into the markov chain? Default `True`|
-|includeMyRenotes|`boolean`|Should the notes you renoted be included? So your bot will make sentences you didn't wrote. Default `false`|
+|includeReplies|`boolean`|Should reply included into the markov chain? Default `True`|
+|includeMyRenotes|`boolean`|Should the notes you renoted be included? So your bot will use sentences for the markov chain you haven't written. Default `false`|
 |excludeNsfw|`boolean`|Should be Notes included that are behind a CW Tag? Default `False` (Use with caution! The bot not CW any post he makes!)|
-|test_output|`boolean`|Should be the created sentence be tested against the following statements? Default `true` (Highly recomended, otherwise sentences could repeat itself, could be very short or very long.)|
+|test_output|`boolean`|Should be the created sentence be tested against the following statements? Default `true` (Highly recommended, otherwise sentences could repeat itself, could be very short or very long.)|
 |tries|`integer`|How many times the bot tries to make a sentence that meets the given criteria|
 |max_overlap_ratio|`float`|How many percent of the created sentence is allowed to be the same as the source text. Lower value means more gibberish, higher value to more exact copies of source material. Can be between `0`and `1`. Default `0.6`|
 |max_overlap_total|`integer`|How many words are allowed to be the same? Default `15`|
 |min_words|`integer`|How many words the sentence must have at least. Default `None`|
 |max_words|`integer`|How many words the sentence must have at maximum. Default `None`|
 
-You can change the configuration while the bot is running. No restart necessary, they take immediate effect.
+Changes to the Markov chain section of the .cfg-file will have immediate effect.
+Changes to the misskey part of the *.cfg-file, requires a restart of the bot.
 
 ## Known Quirks
-- The startup needs quite some time. On my system about 10 seconds. You knwo that everything runs well when the first Note is posted.
-- When the bot is started, it could happen that he runs in a timeout in the first 600 seconds. To prevent that, just mention the bot and he will stay in a loop.
+- The startup needs quite some time. On my system about 10 seconds. You know that everything runs well when the first Note is posted.
+- When the bot is started, he runs in a timeout in the first 60 seconds. To prevent that, just mention the bot, and he will stay in a loop.
 
 ## Contributors
 [Shibao](https://github.com/shibaobun) - Docker support and bug hunting<br />
 [Yupix](https://github.com/yupix) - Mi.py framework and clean code<br />
-[Nullobsi](https://github.com/nullobsi) - Added multi user support
+[Nullobsi](https://github.com/nullobsi) - Added multi-user support<br />
+[ThatOneCalculator](https://github.com/ThatOneCalculator) - Option to CW the posts<br />
 
 Thank you very much! Without your this project wouldn't be on this level!
