@@ -13,8 +13,11 @@ config.read(Path(__file__).parent.joinpath('bot.cfg'))
 uri = "https://" + config.get("misskey", "instance_write")
 token = config.get("misskey", "token")
 
-contentwarning = config.get("misskey", "cw")
-if contentwarning.lower() == "none":
+try:
+    contentwarning = config.get("misskey", "cw")
+    if contentwarning.lower() == "none":
+        contentwarning = None
+except (TypeError, ValueError):
     contentwarning = None
 
 class MyBot(commands.Bot):
