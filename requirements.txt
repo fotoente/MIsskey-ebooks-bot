@@ -5,4 +5,4 @@ requests
 msgpack
 regex
 git+https://github.com/yupix/mipa.git
-mipac
+git+https://github.com/yupix/mipac.git
