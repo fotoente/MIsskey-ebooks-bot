@@ -4,7 +4,7 @@ Misskey eBooks Bot with Markov Chain
 [Example @roboduck@ente.fun](https://ente.fun/@roboduck)
 
 ## Introduction
-This small python script is a Markov Chain eBooks bot based on the framework of [mi.py](https://github.com/yupix/Mi.py.git)
+This small python script is a Markov Chain eBooks bot based on the framework of [MiPA](https://github.com/yupix/MiPA.git)
 
 It can only read and write from and to Misskey. Reading from Mastodon or Pleroma is not (yet) implemented.
 
@@ -17,27 +17,31 @@ After this he only updates the database with new posts. The upgrading is threade
 ## Installation
 
 ### Host Installation
-To run `mi.py` you must install `python3.9` and `python3.9-dev` onto your system. (Please be aware of the requirements for mi.py!)
-`mi.py` is still under development and a lot of things change there quickly so please be aware that there could be chances that something changed, that I haven't implemented in the bot at the moment.
-to install `mi.py`please use the following command.
-`pip install git+https://github.com/yupix/Mi.py.git`
+To run `MiPA` you must install `python3.10`onto your system. (Please be aware that not all programs on your system might work under Python3.10!)
+`MiPA` is still under development and a lot of things change there quickly so please be aware that there could be changes, that haven't been implemented in the bot yet! (I try my best to keep it up to date!)
+to install `MiPA`please use the following commands:
+`python3.10 -m pip install git+https://github.com/yupix/MiPA.git`
+`python3.10 -m pip install git+https://github.com/yupix/MiPAC.git`
 
 For the bot to run you also need two additional packages
 ```
 markovify
 configparser
+ujson
+requests
+msgpack
 regex
 ```
 
-or just use the command `pip install -r requirements.txt` in the local folder where you cloned the repo.
+or just use the command `python3.10 -m pip install -r requirements.txt` in the local folder where you cloned the repo.
 
 Before starting the bot, please copy `example-bot.cfg` to `bot.cfg` and
 configure it according to the configuration section below.
 
 The best way to run it would be a `systemd` unit file and run it as a daemon.
-Just to test it you can use `nohup python3.9 rdbot.py &` in the directory the bot is located in.
+Just to test it you can use `nohup python3.10 rdbot.py &` in the directory the bot is located in.
 
-### Docker
+### Docker (To be checked!)
 
 To host this image with docker, copy the `docker-compose.yml` file to the directory that you want to host it from.
 
@@ -60,6 +64,7 @@ Following things can be edited:
 |instance_write|domain.tld|Put here the domain of the Misskey instance your bot is running. Only domain name and TLD, no `/`,`:` or `https`
 |token|`String`|The token from your bot. Needs right to write notes and read notification|
 |cw|`String` or `None`|If the markov bot post should be posted with a content warning. Any String given here will show up as CW text. "none" to deactivate.|
+|exclude_links|`boolean`|Should every link starting with `http://` and `https://` be removed? `false` as default|
 |min_notes|`interger`|How many posts should be read at the initial start. Please state a number in 100 increments. Higher number means more variety but also more load when loading those and a bigger database and json file. 5000 notes resulted in ~3 MB disk space used. Default `5000`|
 |max_notes|`interger`|How many posts should be stored in the database. Everything over this number will be deleted during an update cycle Default `5000`|
 |includeReplies|`boolean`|Should reply included into the markov chain? Default `True`|
@@ -74,14 +79,14 @@ Following things can be edited:
 
 Changes to the Markov chain section of the .cfg-file will have immediate effect.
 Changes to the misskey part of the *.cfg-file, requires a restart of the bot.
+If an option is missing from the `misskey` part of the config file, the default values will be used.
 
 ## Known Quirks
 - The startup needs quite some time. On my system about 10 seconds. You know that everything runs well when the first Note is posted.
-- When the bot is started, he runs in a timeout in the first 60 seconds. To prevent that, just mention the bot, and he will stay in a loop.
 
 ## Contributors
 [Shibao](https://github.com/shibaobun) - Docker support and bug hunting<br />
-[Yupix](https://github.com/yupix) - Mi.py framework and clean code<br />
+[Yupix](https://github.com/yupix) - MiPA framework and clean code<br />
 [Nullobsi](https://github.com/nullobsi) - Added multi-user support<br />
 [ThatOneCalculator](https://github.com/ThatOneCalculator) - Option to CW the posts<br />
 
