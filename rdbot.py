@@ -1,16 +1,17 @@
 import asyncio
 import threading
 
-from mi.ext import commands, tasks
-from mi.framework import Note
-from mi.framework.router import Router
+from mipa.ext import commands, tasks
+from mipa.router import Router
+from mipac.models import Note
+from mipac.util import check_multi_arg
 
-from roboduck import *
+import roboduck
 
 # Load Misskey configuration
 config = configparser.ConfigParser()
 config.read(Path(__file__).parent.joinpath('bot.cfg'))
-uri = "https://" + config.get("misskey", "instance_write")
+url = "https://" + config.get("misskey", "instance_write")
 token = config.get("misskey", "token")
 
 try:
@@ -19,6 +20,9 @@ try:
         contentwarning = None
 except (TypeError, ValueError):
     contentwarning = None
+
+if not check_multi_arg(url, token):
+    raise Exception("Misskey instance and token are required.")
 
 class MyBot(commands.Bot):
     text_model = None  # Holds the markov object, so it won't be recreated everytime
@@ -29,7 +33,7 @@ class MyBot(commands.Bot):
     @tasks.loop(3600)
     async def loop_1h(self):
         text = create_sentence()
-        await bot.client.note.send(content=text, visibility="home", cw=contentwarning)
+        await bot.client.note.action.send(content=text, visibility="public", cw=contentwarning)
 
     @tasks.loop(43200)
     async def loop_12h(self):
@@ -39,7 +43,7 @@ class MyBot(commands.Bot):
 
     async def on_ready(self, ws):
         await Router(ws).connect_channel(["global", "main"])  # Connect to global and main channels
-        await bot.client.note.send(content=datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " :roboduck: Bot started!",
+        await self.client.note.action.send(content=datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " Roboduck Bot started!",
                                    visibility="specified")
         self.loop_12h.start()  # Launching renew posts every 12 hours
         self.loop_1h.start()  #
@@ -62,4 +66,4 @@ if __name__ == "__main__":
         init_bot()
 
     bot = MyBot()
-    asyncio.run(bot.start(uri, token, timeout=600))
+    asyncio.run(bot.start(url, token))

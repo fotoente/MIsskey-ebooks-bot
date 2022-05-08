@@ -4,3 +4,5 @@ ujson
 requests
 msgpack
 regex
+git+https://github.com/yupix/mipa.git
+mipac
