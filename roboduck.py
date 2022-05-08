@@ -71,17 +71,17 @@ def get_notes(**kwargs):
     # Read & Sanitize Inputs from Config File
     try:
         include_replies = check_str_to_bool(config.get("markov", "includeReplies"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         include_replies = True
 
     try:
         include_my_renotes = check_str_to_bool(config.get("markov", "includeMyRenotes"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         include_my_renotes = False
 
     try:
         exclude_nsfw = check_str_to_bool(config.get("markov", "excludeNsfw"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         exclude_nsfw = True
 
     run = True
