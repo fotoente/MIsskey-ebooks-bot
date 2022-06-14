@@ -23,7 +23,7 @@ to install `MiPA`please use the following commands:
 `python3.10 -m pip install git+https://github.com/yupix/MiPA.git`
 `python3.10 -m pip install git+https://github.com/yupix/MiPAC.git`
 
-For the bot to run you also need two additional packages
+For the bot to run you also need a few additional packages
 ```
 markovify
 configparser
@@ -41,7 +41,7 @@ configure it according to the configuration section below.
 The best way to run it would be a `systemd` unit file and run it as a daemon.
 Just to test it you can use `nohup python3.10 rdbot.py &` in the directory the bot is located in.
 
-### Docker (To be checked!)
+### Docker (Will be updated later, so might be broken at the moment!)
 
 To host this image with docker, copy the `docker-compose.yml` file to the directory that you want to host it from.
 
