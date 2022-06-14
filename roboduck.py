@@ -71,18 +71,23 @@ def get_notes(**kwargs):
     # Read & Sanitize Inputs from Config File
     try:
         include_replies = check_str_to_bool(config.get("markov", "includeReplies"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         include_replies = True
 
     try:
         include_my_renotes = check_str_to_bool(config.get("markov", "includeMyRenotes"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         include_my_renotes = False
 
     try:
         exclude_nsfw = check_str_to_bool(config.get("markov", "excludeNsfw"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         exclude_nsfw = True
+
+    try:
+        exclude_links = check_str_to_bool(config.get("markov", "exclude_links"))
+    except (TypeError, ValueError, configparser.NoOptionError):
+        exclude_links = False
 
     run = True
     oldnote = ""
@@ -145,6 +150,9 @@ def get_notes(**kwargs):
                             content)  # Remove instance name with regular expression
         content = content.replace("::", ": :")  # Break long emoji chains
         content = content.replace("@", "@" + chr(8203))
+
+        if exclude_links:
+            content = regex.sub(r"(http|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))", "", content)
 
         note_dict = {"id": element["id"], "text": content, "timestamp": lastTimestamp, "user_id": userid}
         return_list.append(note_dict)
