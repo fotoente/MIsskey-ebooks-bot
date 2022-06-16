@@ -41,7 +41,7 @@ configure it according to the configuration section below.
 The best way to run it would be a `systemd` unit file and run it as a daemon.
 Just to test it you can use `nohup python3.10 rdbot.py &` in the directory the bot is located in.
 
-### Docker (Will be updated later, so might be broken at the moment!)
+### Docker
 
 To host this image with docker, copy the `docker-compose.yml` file to the directory that you want to host it from.
 
