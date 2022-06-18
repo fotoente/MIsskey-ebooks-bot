@@ -19,15 +19,35 @@ def check_str_to_bool(text) -> bool:
     else:
         return True
 
+def get_endpoint(instance:str) -> str:
+    #Try Misskey
+    url = "https://" + instance + "/api/ping"
+    req = requests.post(url)
+    if req.status_code == 200:
+        return "Misskey"
 
-def misskey_get_user_id(username, instance):
+    #Try Mastodon and Pleroma
+    url = "https://" + instance + "/api/v1/instance" #Pleroma uses the same API as Mastodon
+    req = requests.get(url)
+    if req.status_code == 200:
+        version = req.json()["version"]
+
+        if version.find("(compatible; Pleroma") > 0: #String only available in Pleroma instances. Mastodon will return '-1'
+          return "Pleroma"
+        else:
+            return "Mastodon"
+
+    return "unknown"
+
+
+def misskey_get_user_id(username:str, instance:str) -> str:
     url = "https://" + instance + "/api/users/show"
     try:
         req = requests.post(url, json={"username": username, "host": instance})
         req.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print("Couldn't get Username! " + str(err))
-        sys.exit(1)
+        return None
     return req.json()["id"]
 
 
@@ -159,6 +179,26 @@ def misskey_get_notes(**kwargs):
 
     return return_list
 
+def mastodon_get_user_id(username:str, instance:str) -> str:
+    url = "https://" + instance + "/api/v1/accounts/lookup?acct=" + username
+
+    try:
+        req = requests.get(url)
+        req.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print("Couldn't get Username! " + str(err))
+        return None
+    return req.json()["id"]
+
+def mastodon_get_notes():
+    print("MASTODON'T NOTES!") #TODO Write routine to get Mastodon notes (check for limiting commands!)
+
+def pleroma_get_user_id(username:str, instance:str) -> str:
+    #Pleroma uses the Mastodon API so as a shortcut I just reuse the Mastodon function
+    return mastodon_get_user_id(username, instance)
+
+def pleroma_get_notes():
+    print("Pleroma notes!") #TODO Write routine to get leroma notes (check for limiting commands)
 
 def calculate_markov_chain():
     text = ""
