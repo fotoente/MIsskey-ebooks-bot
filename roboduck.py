@@ -19,41 +19,42 @@ def check_str_to_bool(text) -> bool:
     else:
         return True
 
-def get_endpoint(instance:str) -> str:
-    #Try Misskey
+
+def get_endpoint(instance: str) -> str:
+    # Try Misskey
     url = "https://" + instance + "/api/ping"
     req = requests.post(url)
     if req.status_code == 200:
         return "Misskey"
 
-    #Try Mastodon and Pleroma
-    url = "https://" + instance + "/api/v1/instance" #Pleroma uses the same API as Mastodon
+    # Try Mastodon and Pleroma
+    url = "https://" + instance + "/api/v1/instance"  # Pleroma uses the same API as Mastodon
     req = requests.get(url)
     if req.status_code == 200:
         version = req.json()["version"]
 
-        if version.find("(compatible; Pleroma") > 0: #String only available in Pleroma instances. Mastodon will return '-1'
-          return "Pleroma"
+        if version.find("(compatible; Pleroma") > 0:  # String only available in Pleroma instances. Mastodon will
+            return "Pleroma"
         else:
             return "Mastodon"
 
     return "unknown"
 
 
-def misskey_get_user_id(username:str, instance:str) -> str:
+def misskey_get_user_id(username: str, instance: str) -> str:
     url = "https://" + instance + "/api/users/show"
     try:
         req = requests.post(url, json={"username": username, "host": instance})
         req.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print("Couldn't get Username! " + str(err))
-        return None
+        return ""
     return req.json()["id"]
 
 
 def misskey_get_notes(**kwargs):
     note_id = "k"
-    sinceid = ""
+    since_id = ""
     min_notes = 0
     notes_list = []
     return_list = []
@@ -70,7 +71,7 @@ def misskey_get_notes(**kwargs):
         elif "lastnote" in kwargs:
             # print("Lastnote found!")
             init = False
-            sinceid = kwargs["lastnote"]
+            since_id = kwargs["lastnote"]
 
         else:
             print("Wrong arguments given!")
@@ -117,7 +118,8 @@ def misskey_get_notes(**kwargs):
         if (init and len(notes_list) >= min_notes) or (oldnote == note_id):
             break
 
-        if not init:  # sinceid should only be used when updating the database so the json object has to be parsed every time
+        if not init:  # sinceid should only be used when updating the database so the json object has to be parsed
+            # every time
             api_json = {
                 "userId": userid,
                 "includeReplies": include_replies,
@@ -126,7 +128,7 @@ def misskey_get_notes(**kwargs):
                 "withFiles": False,
                 "excludeNsfw": exclude_nsfw,
                 "untilId": note_id,
-                "sinceId": sinceid}
+                "sinceId": since_id}
         else:
             api_json = {
                 "userId": userid,
@@ -159,7 +161,7 @@ def misskey_get_notes(**kwargs):
 
     for element in notes_list:
         last_time = element["createdAt"]
-        lastTimestamp = int(datetime.timestamp(datetime.strptime(last_time, '%Y-%m-%dT%H:%M:%S.%f%z')) * 1000)
+        last_timestamp = int(datetime.timestamp(datetime.strptime(last_time, '%Y-%m-%dT%H:%M:%S.%f%z')) * 1000)
 
         content = element["text"]
 
@@ -172,14 +174,16 @@ def misskey_get_notes(**kwargs):
         content = content.replace("@", "@" + chr(8203))
 
         if exclude_links:
-            content = regex.sub(r"(http|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))", "", content)
+            content = regex.sub(r"(http|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))",
+                                "", content)
 
-        note_dict = {"id": element["id"], "text": content, "timestamp": lastTimestamp, "user_id": userid}
+        note_dict = {"id": element["id"], "text": content, "timestamp": last_timestamp, "user_id": userid}
         return_list.append(note_dict)
 
     return return_list
 
-def mastodon_get_user_id(username:str, instance:str) -> str:
+
+def mastodon_get_user_id(username: str, instance: str) -> str:
     url = "https://" + instance + "/api/v1/accounts/lookup?acct=" + username
 
     try:
@@ -187,18 +191,22 @@ def mastodon_get_user_id(username:str, instance:str) -> str:
         req.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print("Couldn't get Username! " + str(err))
-        return None
+        return ""
     return req.json()["id"]
 
-def mastodon_get_notes():
-    print("MASTODON'T NOTES!") #TODO Write routine to get Mastodon notes (check for limiting commands!)
 
-def pleroma_get_user_id(username:str, instance:str) -> str:
-    #Pleroma uses the Mastodon API so as a shortcut I just reuse the Mastodon function
+def mastodon_get_notes():
+    print("MASTODON'T NOTES!")  # TODO Write routine to get Mastodon notes (check for limiting commands!)
+
+
+def pleroma_get_user_id(username: str, instance: str) -> str:
+    # Pleroma uses the Mastodon API so as a shortcut I just reuse the Mastodon function
     return mastodon_get_user_id(username, instance)
 
+
 def pleroma_get_notes():
-    print("Pleroma notes!") #TODO Write routine to get leroma notes (check for limiting commands)
+    print("Pleroma notes!")  # TODO Write routine to get Pleroma notes (check for limiting commands)
+
 
 def calculate_markov_chain():
     text = ""
@@ -261,7 +269,8 @@ def clean_database():
         userid = misskey_get_user_id(username, instance)
         data = database.cursor()
         data.execute(
-            "DELETE FROM notes WHERE user_id=:user_id AND id NOT IN (SELECT id FROM notes WHERE user_id=:user_id ORDER BY timestamp DESC LIMIT :max );",
+            "DELETE FROM notes WHERE user_id=:user_id AND id NOT IN (SELECT id FROM notes WHERE user_id=:user_id "
+            "ORDER BY timestamp DESC LIMIT :max );",
             {"user_id": userid, "max": int(max_notes)})
 
     database.commit()
@@ -331,7 +340,7 @@ def create_sentence():
         min_words = None
 
     """
-    #Debug section to rpint the used values
+    #Debug section to print the used values
     print("These values are used:")
     print("test_output: " + str(test_output))
     print("tries: " + str(tries))
@@ -357,7 +366,7 @@ def create_sentence():
 
 
 def update():
-    notesList = []
+    notes_list = []
     databasepath = Path(__file__).parent.joinpath('roboduck.db')
     if not (os.path.exists(databasepath) and os.stat(databasepath).st_size != 0):
         print("No database found!")
@@ -376,20 +385,21 @@ def update():
         userid = misskey_get_user_id(username, instance)
         data = database.cursor()
         data.execute(
-            "SELECT id FROM notes WHERE timestamp = (SELECT MAX(timestamp) FROM notes WHERE user_id=:user_id) AND user_id=:user_id;",
+            "SELECT id FROM notes WHERE timestamp = (SELECT MAX(timestamp) FROM notes WHERE user_id=:user_id) AND "
+            "user_id=:user_id;",
             {"user_id": userid})
 
-        sinceNote = data.fetchone()[0]
+        since_note = data.fetchone()[0]
 
-        notesList.extend(misskey_get_notes(lastnote=sinceNote, username=username, instance=instance))
+        notes_list.extend(misskey_get_notes(lastnote=since_note, username=username, instance=instance))
 
-    if notesList == 0:
+    if notes_list == 0:
         database.close()
         return
 
     print("Insert new notes to database...")
     database.executemany("INSERT OR IGNORE INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)",
-                         [(note["id"], note["text"], note["timestamp"], note["user_id"]) for note in notesList])
+                         [(note["id"], note["text"], note["timestamp"], note["user_id"]) for note in notes_list])
 
     database.commit()
     print("Notes updated!")
@@ -420,7 +430,7 @@ def init_bot():
 
     with open(databasepath, "w+", encoding="utf-8"):
         database = sqlite3.connect(databasepath)
-        print("Connected to roboduck.db succesfull...")
+        print("Connected to roboduck.db successful...")
 
     print("Creating Table...")
     database.execute("CREATE TABLE notes (id CHAR(10) PRIMARY KEY, text CHAR(5000), timestamp INT, user_id CHAR(10));")
@@ -439,12 +449,12 @@ def init_bot():
     for user in config.get("misskey", "users").split(";"):
         print("Try reading first " + str(initnotes) + " notes for " + user + ".")
 
-        notesList = misskey_get_notes(min_notes=initnotes, username=user.split("@")[1], instance=user.split("@")[2])
+        notes_list = misskey_get_notes(min_notes=initnotes, username=user.split("@")[1], instance=user.split("@")[2])
 
         print("Writing notes into database...")
 
         database.executemany("INSERT INTO notes (id, text, timestamp, user_id) VALUES(?, ?, ?, ?)",
-                             [(note["id"], note["text"], note["timestamp"], note["user_id"]) for note in notesList])
+                             [(note["id"], note["text"], note["timestamp"], note["user_id"]) for note in notes_list])
 
     database.commit()
     database.close()
