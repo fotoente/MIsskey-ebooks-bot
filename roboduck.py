@@ -20,7 +20,7 @@ def check_str_to_bool(text) -> bool:
         return True
 
 
-def get_user_id(username, instance):
+def misskey_get_user_id(username, instance):
     url = "https://" + instance + "/api/users/show"
     try:
         req = requests.post(url, json={"username": username, "host": instance})
@@ -31,7 +31,7 @@ def get_user_id(username, instance):
     return req.json()["id"]
 
 
-def get_notes(**kwargs):
+def misskey_get_notes(**kwargs):
     note_id = "k"
     sinceid = ""
     min_notes = 0
@@ -66,7 +66,7 @@ def get_notes(**kwargs):
     config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
     # print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
 
-    userid = get_user_id(username, instance)
+    userid = misskey_get_user_id(username, instance)
 
     # Read & Sanitize Inputs from Config File
     try:
@@ -218,7 +218,7 @@ def clean_database():
     for user in config.get("misskey", "users").split(";"):
         username = user.split("@")[1]
         instance = user.split("@")[2]
-        userid = get_user_id(username, instance)
+        userid = misskey_get_user_id(username, instance)
         data = database.cursor()
         data.execute(
             "DELETE FROM notes WHERE user_id=:user_id AND id NOT IN (SELECT id FROM notes WHERE user_id=:user_id ORDER BY timestamp DESC LIMIT :max );",
@@ -333,7 +333,7 @@ def update():
     for user in config.get("misskey", "users").split(";"):
         username = user.split("@")[1]
         instance = user.split("@")[2]
-        userid = get_user_id(username, instance)
+        userid = misskey_get_user_id(username, instance)
         data = database.cursor()
         data.execute(
             "SELECT id FROM notes WHERE timestamp = (SELECT MAX(timestamp) FROM notes WHERE user_id=:user_id) AND user_id=:user_id;",
@@ -341,7 +341,7 @@ def update():
 
         sinceNote = data.fetchone()[0]
 
-        notesList.extend(get_notes(lastnote=sinceNote, username=username, instance=instance))
+        notesList.extend(misskey_get_notes(lastnote=sinceNote, username=username, instance=instance))
 
     if notesList == 0:
         database.close()
@@ -399,7 +399,7 @@ def init_bot():
     for user in config.get("misskey", "users").split(";"):
         print("Try reading first " + str(initnotes) + " notes for " + user + ".")
 
-        notesList = get_notes(min_notes=initnotes, username=user.split("@")[1], instance=user.split("@")[2])
+        notesList = misskey_get_notes(min_notes=initnotes, username=user.split("@")[1], instance=user.split("@")[2])
 
         print("Writing notes into database...")
 
