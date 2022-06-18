@@ -16,4 +16,4 @@ RUN pip3.10 install git+https://github.com/yupix/MiPA.git
 RUN pip3.10 install git+https://github.com/yupix/MiPAC.git
 COPY . .
 
-CMD [ "python3.10", "-u", "rdbot" ]
+CMD [ "python3.10", "-u", "rdbot.py" ]

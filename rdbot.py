@@ -62,7 +62,7 @@ if __name__ == "__main__":
     databasepath = roboduck.Path(__file__).parent.joinpath('roboduck.db')
 
     if not (roboduck.os.path.exists(databasepath) and roboduck.os.stat(databasepath).st_size != 0):
-        init_bot()
+        roboduck.init_bot()
 
     bot = MyBot()
     asyncio.run(bot.start(url, token))
