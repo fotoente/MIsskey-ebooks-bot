@@ -85,9 +85,9 @@ def misskey_get_notes(**kwargs):
     # Load configuration
     config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
-    # print(os.path.join(os.path.dirname(__file__), 'bot.cfg'))
 
-    userid = misskey_get_user_id(username, instance)
+    userid = misskey_get_user_id(username, instance)  # Here are only Misskey ID is necessary so no need to check
+    # endpoint again
 
     # Read & Sanitize Inputs from Config File
     try:
@@ -208,6 +208,22 @@ def pleroma_get_notes():
     print("Pleroma notes!")  # TODO Write routine to get Pleroma notes (check for limiting commands)
 
 
+def get_user_id(username: str, instance: str) -> str:
+    # Determine API endpoint
+    api = get_endpoint(instance)
+
+    # Determine how to get User ID on used Software
+    if api == "Misskey":
+        return misskey_get_user_id(username, instance)
+    elif api == "Mastodon":
+        return mastodon_get_user_id(username, instance)
+    elif api == "Pleroma":
+        return pleroma_get_user_id(username, instance)
+    else:
+        print("Domain isn't Misskey, Pleroma or Mastodon!\nCheck spelling of the domain!")
+        sys.exit(1)
+
+
 def calculate_markov_chain():
     text = ""
     # Load configuration
@@ -215,7 +231,7 @@ def calculate_markov_chain():
     config.read(Path(__file__).parent.joinpath('bot.cfg'))
     try:
         max_notes = config.get("markov", "max_notes")
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         max_notes = "10000"
 
     databasepath = Path(__file__).parent.joinpath('roboduck.db')
@@ -266,7 +282,9 @@ def clean_database():
     for user in config.get("misskey", "users").split(";"):
         username = user.split("@")[1]
         instance = user.split("@")[2]
-        userid = misskey_get_user_id(username, instance)
+
+        userid = get_user_id(username, instance)
+
         data = database.cursor()
         data.execute(
             "DELETE FROM notes WHERE user_id=:user_id AND id NOT IN (SELECT id FROM notes WHERE user_id=:user_id "
@@ -286,42 +304,42 @@ def create_sentence():
     # Reading config file bot.cfg with config parser
     config = configparser.ConfigParser()
     config.read(Path(__file__).parent.joinpath('bot.cfg'))
-    # print((Path(__file__).parent).joinpath('bot.cfg'))
+
     # Read & Sanitize Inputs
     try:
         test_output = check_str_to_bool(config.get("markov", "test_output"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, configparser.NoOptionError):
         # print("test_output: " + str(err))
         test_output = True
 
     if test_output:
         try:
             tries = int(config.get("markov", "tries"))
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, configparser.NoOptionError):
             # print("tries: " + str(err))
             tries = 250
 
         try:
             max_overlap_ratio = float(config.get("markov", "max_overlap_ratio"))
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, configparser.NoOptionError):
             # print("max_overlap_ratio: " + str(err))
             max_overlap_ratio = 0.7
 
         try:
             max_overlap_total = int(config.get("markov", "max_overlap_total"))
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, configparser.NoOptionError):
             # print("max_overlap_total: " + str(err))
             max_overlap_total = 10
 
         try:
             max_words = int(config.get("markov", "max_words"))
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, configparser.NoOptionError):
             # print("max_words: " + str(err))
             max_words = None
 
         try:
             min_words = int(config.get("markov", "min_words"))
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, configparser.NoOptionError):
             # print("min_words: " + str(err))
             min_words = None
 
@@ -382,7 +400,7 @@ def update():
     for user in config.get("misskey", "users").split(";"):
         username = user.split("@")[1]
         instance = user.split("@")[2]
-        userid = misskey_get_user_id(username, instance)
+        userid = get_user_id(username, instance)
         data = database.cursor()
         data.execute(
             "SELECT id FROM notes WHERE timestamp = (SELECT MAX(timestamp) FROM notes WHERE user_id=:user_id) AND "
@@ -433,7 +451,7 @@ def init_bot():
         print("Connected to roboduck.db successful...")
 
     print("Creating Table...")
-    database.execute("CREATE TABLE notes (id CHAR(10) PRIMARY KEY, text CHAR(5000), timestamp INT, user_id CHAR(10));")
+    database.execute("CREATE TABLE notes (id CHAR(20) PRIMARY KEY, text CHAR(5000), timestamp INT, user_id CHAR(10));")
 
     print("Table NOTES created...")
 
