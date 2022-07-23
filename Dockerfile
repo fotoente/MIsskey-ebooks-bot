@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3.10-alpine
 
 RUN apk add --no-cache \
 	py3-pip \
@@ -10,10 +10,10 @@ RUN apk add --no-cache \
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-#RUN pip install git+https://github.com/yupix/Mi.py.git@v3.9.91
-
+RUN pip3.10 install --upgrade pip
+RUN pip3.10 install --no-cache-dir -r requirements.txt
+RUN pip3.10 install git+https://github.com/yupix/MiPA.git
+RUN pip3.10 install git+https://github.com/yupix/MiPAC.git
 COPY . .
 
-CMD [ "python", "-u", "./rdbot.py" ]
+CMD [ "python3.10", "-u", "rdbot.py" ]

@@ -6,7 +6,7 @@ Misskey eBooks Bot with Markov Chain
 ## Introduction
 This small python script is a Markov Chain eBooks bot based on the framework of [MiPA](https://github.com/yupix/MiPA.git)
 
-It can only read and write from and to Misskey. Reading from Mastodon or Pleroma is not (yet) implemented.
+It can only write to Misskey. It is possible to read from Misskey, Pleroma or Mastodon instances.
 
 It posts every hour on his own and reacts to mention. Every 12 hours the bot reloads the notes and recalculates the Markov Chain.
 
@@ -23,7 +23,7 @@ to install `MiPA`please use the following commands:
 `python3.10 -m pip install git+https://github.com/yupix/MiPA.git`
 `python3.10 -m pip install git+https://github.com/yupix/MiPAC.git`
 
-For the bot to run you also need two additional packages
+For the bot to run you also need a few additional packages
 ```
 markovify
 configparser
@@ -41,7 +41,7 @@ configure it according to the configuration section below.
 The best way to run it would be a `systemd` unit file and run it as a daemon.
 Just to test it you can use `nohup python3.10 rdbot.py &` in the directory the bot is located in.
 
-### Docker (To be checked!)
+### Docker
 
 To host this image with docker, copy the `docker-compose.yml` file to the directory that you want to host it from.
 
