@@ -24,6 +24,7 @@ except (TypeError, ValueError, roboduck.configparser.NoOptionError):
 if not check_multi_arg(url, token):
     raise Exception("Misskey instance and token are required.")
 
+
 class MyBot(commands.Bot):
 
     def __init__(self):
