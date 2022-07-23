@@ -21,9 +21,11 @@ def check_str_to_bool(text) -> bool:
 
 
 def get_endpoint(instance: str) -> str:
+    print(instance)
 
     print("Try Misskey...")
     url = "https://" + instance + "/api/ping"
+    print(url)
     req = requests.post(url)
     if req.status_code == 200 and ("pong" in req.json()):
         print("Misskey found...")
@@ -32,6 +34,7 @@ def get_endpoint(instance: str) -> str:
     # Try Mastodon and Pleroma
     print("Try Mastodon and Pleroma...")
     url = "https://" + instance + "/api/v1/instance"  # Pleroma uses the same API as Mastodon
+    print(url)
     req = requests.get(url)
     if req.status_code == 200:
         version = req.json()["version"]
