@@ -1,3 +1,3 @@
-from roboduck import *
+import roboduck
 
-update()
+roboduck.update()

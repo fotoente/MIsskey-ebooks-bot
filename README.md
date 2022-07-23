@@ -6,7 +6,7 @@ Misskey eBooks Bot with Markov Chain
 ## Introduction
 This small python script is a Markov Chain eBooks bot based on the framework of [MiPA](https://github.com/yupix/MiPA.git)
 
-It can only read and write from and to Misskey. Reading from Mastodon or Pleroma is not (yet) implemented.
+It can only write to Misskey. It is possible to read from Misskey, Pleroma or Mastodon instances.
 
 It posts every hour on his own and reacts to mention. Every 12 hours the bot reloads the notes and recalculates the Markov Chain.
 
